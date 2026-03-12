@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>🎲 3D豪华骰盅</title>
+    <title>🎲 摇骰子</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -13,698 +13,370 @@
             -webkit-tap-highlight-color: transparent;
         }
         
-        :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --accent: #f59e0b;
-            --bg-1: #f0f9ff;
-            --bg-2: #e0f2fe;
-            --bg-3: #dbeafe;
-            --text: #1e293b;
-            --text-light: #64748b;
-            --shadow: rgba(0,0,0,0.1);
-        }
-        
         body {
             min-height: 100vh;
-            background: linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 50%, var(--bg-3) 100%);
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
-            color: var(--text);
-            overflow-x: hidden;
-        }
-        
-        /* 柔和背景装饰 */
-        .bg-decoration {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            overflow: hidden;
-            z-index: 0;
-        }
-        
-        .bg-circle {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.6;
-        }
-        
-        .bg-circle-1 {
-            width: 400px;
-            height: 400px;
-            background: linear-gradient(135deg, #c4b5fd, #a78bfa);
-            top: -100px;
-            right: -100px;
-        }
-        
-        .bg-circle-2 {
-            width: 300px;
-            height: 300px;
-            background: linear-gradient(135deg, #fde68a, #fbbf24);
-            bottom: 100px;
-            left: -50px;
-        }
-        
-        .bg-circle-3 {
-            width: 200px;
-            height: 200px;
-            background: linear-gradient(135deg, #bfdbfe, #93c5fd);
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            color: white;
+            padding: 20px;
+            padding-bottom: 100px;
         }
         
         .container {
-            position: relative;
-            z-index: 1;
-            max-width: 430px;
+            max-width: 400px;
             margin: 0 auto;
-            padding: 20px;
-            padding-bottom: 120px;
         }
         
-        /* 头部卡片 */
-        .header-card {
-            background: rgba(255,255,255,0.7);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 24px;
-            margin-bottom: 20px;
-            box-shadow: 
-                0 4px 20px rgba(0,0,0,0.05),
-                0 1px 3px rgba(0,0,0,0.1);
-            border: 1px solid rgba(255,255,255,0.5);
+        /* 标题 */
+        .title {
             text-align: center;
+            padding: 20px 0;
         }
         
-        .header-title {
-            font-size: 1.6em;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 8px;
+        .title h1 {
+            font-size: 2em;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
         
-        .header-subtitle {
-            color: var(--text-light);
-            font-size: 0.9em;
-        }
-        
-        /* 设置卡片 */
-        .settings-card {
-            background: rgba(255,255,255,0.7);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 20px;
+        /* 设置 */
+        .settings {
+            background: rgba(255,255,255,0.15);
+            border-radius: 16px;
+            padding: 15px;
             margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            border: 1px solid rgba(255,255,255,0.5);
         }
         
-        .setting-item {
+        .setting-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-        
-        .setting-item:last-child {
-            border-bottom: none;
+            margin: 10px 0;
         }
         
         .setting-label {
-            font-weight: 600;
-            color: var(--text);
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            font-size: 0.9em;
         }
         
         .dice-selector {
             display: flex;
-            gap: 6px;
+            gap: 8px;
         }
         
-        .dice-option {
-            width: 38px;
-            height: 38px;
-            border-radius: 12px;
-            border: 2px solid #e2e8f0;
-            background: white;
-            color: var(--text);
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .dice-option:hover {
-            border-color: var(--primary);
-            transform: translateY(-2px);
-        }
-        
-        .dice-option.active {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            border-color: transparent;
+        .dice-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.5);
+            background: transparent;
             color: white;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-            transform: scale(1.05);
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
         }
         
-        /* 开关 */
-        .switch {
-            width: 52px;
-            height: 30px;
-            background: #e2e8f0;
-            border-radius: 15px;
+        .dice-btn.active {
+            background: #ffd700;
+            border-color: #ffd700;
+            color: #333;
+        }
+        
+        .toggle {
+            width: 50px;
+            height: 28px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 14px;
             position: relative;
             cursor: pointer;
             transition: 0.3s;
         }
         
-        .switch.on {
-            background: linear-gradient(135deg, #10b981, #059669);
+        .toggle.on {
+            background: #00d26a;
         }
         
-        .switch-knob {
+        .toggle::after {
+            content: '';
             position: absolute;
-            width: 26px;
-            height: 26px;
+            width: 24px;
+            height: 24px;
             background: white;
             border-radius: 50%;
             top: 2px;
             left: 2px;
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: 0.3s;
         }
         
-        .switch.on .switch-knob {
+        .toggle.on::after {
             left: 24px;
         }
         
-        /* 游戏台 */
-        .game-stage {
-            background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
-            border-radius: 32px;
-            padding: 40px 20px;
+        /* 游戏区域 */
+        .game-box {
+            background: linear-gradient(145deg, #2d1b4e, #1a0f2e);
+            border-radius: 24px;
+            padding: 30px 20px;
+            text-align: center;
+            min-height: 300px;
             position: relative;
-            box-shadow: 
-                0 25px 50px -12px rgba(0,0,0,0.25),
-                inset 0 1px 1px rgba(255,255,255,0.1);
-            min-height: 320px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            perspective: 1200px;
-            overflow: hidden;
         }
         
-        /* 游戏台纹理 */
-        .stage-texture {
-            position: absolute;
-            inset: 0;
-            background: 
-                radial-gradient(ellipse at 30% 20%, rgba(99,102,241,0.15) 0%, transparent 50%),
-                radial-gradient(ellipse at 70% 80%, rgba(245,158,11,0.1) 0%, transparent 50%);
-            pointer-events: none;
-        }
-        
-        /* 3D游戏区 */
-        .game-3d {
+        /* 骰盅容器 */
+        .cup-wrapper {
             position: relative;
-            width: 260px;
+            width: 200px;
             height: 200px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transform-style: preserve-3d;
+            margin: 0 auto;
         }
         
-        /* 骰子区域 */
-        .dice-area {
+        /* 骰子容器 - 始终可见区域 */
+        .dice-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 160px;
+            height: 120px;
             display: flex;
-            gap: 8px;
-            justify-content: center;
-            align-items: center;
             flex-wrap: wrap;
-            width: 220px;
-            min-height: 120px;
-            position: absolute;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
             z-index: 5;
-            transform-style: preserve-3d;
-            padding: 10px;
         }
         
-        /* 精致3D骰子 */
-        .die {
-            width: 50px;
-            height: 50px;
-            position: relative;
-            transform-style: preserve-3d;
-            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .die.hidden {
-            opacity: 0;
-            transform: scale(0.8);
-        }
-        
-        .die-face {
-            position: absolute;
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(145deg, #ffffff 0%, #f1f5f9 100%);
-            border-radius: 10px;
-            box-shadow: 
-                0 4px 6px rgba(0,0,0,0.1),
-                inset 0 1px 0 rgba(255,255,255,0.8),
-                inset 0 -1px 0 rgba(0,0,0,0.05);
+        /* 骰子 */
+        .dice {
+            width: 45px;
+            height: 45px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(3, 1fr);
-            padding: 5px;
-            backface-visibility: hidden;
-            border: 1px solid rgba(0,0,0,0.05);
+            padding: 4px;
+            opacity: 0;
+            transition: opacity 0.5s, transform 0.3s;
         }
         
-        .die-face.front { transform: translateZ(25px); }
-        .die-face.back { transform: rotateY(180deg) translateZ(25px); }
-        .die-face.right { transform: rotateY(90deg) translateZ(25px); }
-        .die-face.left { transform: rotateY(-90deg) translateZ(25px); }
-        .die-face.top { transform: rotateX(90deg) translateZ(25px); }
-        .die-face.bottom { transform: rotateX(-90deg) translateZ(25px); }
+        .dice.show {
+            opacity: 1;
+        }
         
-        .pip {
-            width: 9px;
-            height: 9px;
-            background: linear-gradient(145deg, #334155, #1e293b);
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: #333;
             border-radius: 50%;
             margin: auto;
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
         }
         
-        .pip.red {
-            background: linear-gradient(145deg, #ef4444, #dc2626);
-            box-shadow: 
-                inset 0 1px 2px rgba(0,0,0,0.2),
-                0 0 8px rgba(239,68,68,0.4);
+        .dot.red {
+            background: #e74c3c;
+            box-shadow: 0 0 5px rgba(231,76,60,0.5);
         }
         
         /* 点数布局 */
-        .face-1 .pip:nth-child(1) { grid-area: 2/2; width: 14px; height: 14px; }
-        .face-1 .pip:nth-child(1) { background: linear-gradient(145deg, #ef4444, #dc2626); }
+        .dice[data-value="1"] .dot:nth-child(1) { grid-area: 2/2; width: 14px; height: 14px; background: #e74c3c; }
+        .dice[data-value="2"] .dot:nth-child(1) { grid-area: 1/1; }
+        .dice[data-value="2"] .dot:nth-child(2) { grid-area: 3/3; }
+        .dice[data-value="3"] .dot:nth-child(1) { grid-area: 1/1; }
+        .dice[data-value="3"] .dot:nth-child(2) { grid-area: 2/2; }
+        .dice[data-value="3"] .dot:nth-child(3) { grid-area: 3/3; }
+        .dice[data-value="4"] .dot:nth-child(1) { grid-area: 1/1; }
+        .dice[data-value="4"] .dot:nth-child(2) { grid-area: 1/3; }
+        .dice[data-value="4"] .dot:nth-child(3) { grid-area: 3/1; }
+        .dice[data-value="4"] .dot:nth-child(4) { grid-area: 3/3; }
+        .dice[data-value="5"] .dot:nth-child(1) { grid-area: 1/1; }
+        .dice[data-value="5"] .dot:nth-child(2) { grid-area: 1/3; }
+        .dice[data-value="5"] .dot:nth-child(3) { grid-area: 2/2; }
+        .dice[data-value="5"] .dot:nth-child(4) { grid-area: 3/1; }
+        .dice[data-value="5"] .dot:nth-child(5) { grid-area: 3/3; }
+        .dice[data-value="6"] .dot:nth-child(1) { grid-area: 1/1; }
+        .dice[data-value="6"] .dot:nth-child(2) { grid-area: 1/3; }
+        .dice[data-value="6"] .dot:nth-child(3) { grid-area: 2/1; }
+        .dice[data-value="6"] .dot:nth-child(4) { grid-area: 2/3; }
+        .dice[data-value="6"] .dot:nth-child(5) { grid-area: 3/1; }
+        .dice[data-value="6"] .dot:nth-child(6) { grid-area: 3/3; }
         
-        .face-2 .pip:nth-child(1) { grid-area: 1/1; }
-        .face-2 .pip:nth-child(2) { grid-area: 3/3; }
-        
-        .face-3 .pip:nth-child(1) { grid-area: 1/1; }
-        .face-3 .pip:nth-child(2) { grid-area: 2/2; }
-        .face-3 .pip:nth-child(3) { grid-area: 3/3; }
-        
-        .face-4 .pip:nth-child(1) { grid-area: 1/1; }
-        .face-4 .pip:nth-child(2) { grid-area: 1/3; }
-        .face-4 .pip:nth-child(3) { grid-area: 3/1; }
-        .face-4 .pip:nth-child(4) { grid-area: 3/3; }
-        
-        .face-5 .pip:nth-child(1) { grid-area: 1/1; }
-        .face-5 .pip:nth-child(2) { grid-area: 1/3; }
-        .face-5 .pip:nth-child(3) { grid-area: 2/2; }
-        .face-5 .pip:nth-child(4) { grid-area: 3/1; }
-        .face-5 .pip:nth-child(5) { grid-area: 3/3; }
-        
-        .face-6 .pip:nth-child(1) { grid-area: 1/1; }
-        .face-6 .pip:nth-child(2) { grid-area: 1/3; }
-        .face-6 .pip:nth-child(3) { grid-area: 2/1; }
-        .face-6 .pip:nth-child(4) { grid-area: 2/3; }
-        .face-6 .pip:nth-child(5) { grid-area: 3/1; }
-        .face-6 .pip:nth-child(6) { grid-area: 3/3; }
-        
-        /* 3D金属骰盅 */
-        .cup-3d {
+        /* 直筒圆形骰盅 */
+        .cup {
             position: absolute;
-            width: 240px;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 140px;
             height: 180px;
-            z-index: 20;
+            z-index: 10;
             cursor: pointer;
-            transform-style: preserve-3d;
-            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
-        .cup-3d.shaking {
-            animation: cupShake3d 0.1s infinite;
+        .cup.shaking {
+            animation: shake 0.15s infinite;
         }
         
-        @keyframes cupShake3d {
-            0%, 100% { 
-                transform: translate3d(0, 0, 0) rotateZ(0deg);
-            }
-            20% { 
-                transform: translate3d(-4px, -6px, 10px) rotateZ(-4deg);
-            }
-            40% { 
-                transform: translate3d(4px, -4px, 5px) rotateZ(4deg);
-            }
-            60% { 
-                transform: translate3d(-3px, -8px, 15px) rotateZ(-3deg);
-            }
-            80% { 
-                transform: translate3d(3px, -5px, 8px) rotateZ(3deg);
-            }
+        @keyframes shake {
+            0%, 100% { transform: translateX(-50%) rotate(0deg); }
+            25% { transform: translateX(calc(-50% - 5px)) rotate(-5deg); }
+            75% { transform: translateX(calc(-50% + 5px)) rotate(5deg); }
         }
         
-        .cup-3d.open {
-            transform: translate3d(120px, -250px, 100px) rotateX(-20deg) rotateY(45deg) rotateZ(25deg);
+        .cup.open {
+            transform: translateX(-50%) translateY(-220px) rotate(-20deg);
             opacity: 0.9;
         }
         
-        .cup-body-3d {
+        /* 杯身 - 直筒圆形 */
+        .cup-body {
             width: 100%;
             height: 100%;
+            background: linear-gradient(90deg, 
+                #c0c0c0 0%, 
+                #e8e8e8 20%, 
+                #f5f5f5 35%,
+                #e0e0e0 50%, 
+                #a0a0a0 70%, 
+                #808080 85%,
+                #606060 100%);
+            border-radius: 10px 10px 50% 50%;
             position: relative;
-            transform-style: preserve-3d;
-        }
-        
-        .cup-main {
-            width: 220px;
-            height: 160px;
-            position: relative;
-            background: linear-gradient(135deg, 
-                #e8e8e8 0%, 
-                #c0c0c0 20%, 
-                #a0a0a0 40%, 
-                #808080 50%, 
-                #606060 60%, 
-                #404040 80%, 
-                #303030 100%);
-            border-radius: 50% 50% 45% 45%;
             box-shadow: 
-                0 20px 40px rgba(0,0,0,0.4),
-                inset 0 -10px 20px rgba(0,0,0,0.3),
-                inset 0 10px 20px rgba(255,255,255,0.3),
-                inset -15px 0 30px rgba(0,0,0,0.2),
-                inset 15px 0 30px rgba(255,255,255,0.2);
-            transform-style: preserve-3d;
+                0 15px 30px rgba(0,0,0,0.4),
+                inset -10px 0 20px rgba(0,0,0,0.2),
+                inset 10px 0 20px rgba(255,255,255,0.3);
         }
         
-        /* 金属高光 */
-        .cup-main::before {
-            content: '';
-            position: absolute;
-            top: 15%;
-            left: 20%;
-            width: 30%;
-            height: 20%;
-            background: linear-gradient(135deg, 
-                rgba(255,255,255,0.8) 0%, 
-                rgba(255,255,255,0.2) 50%,
-                transparent 100%);
-            border-radius: 50%;
-            filter: blur(8px);
-        }
-        
-        /* 骰盅顶部 */
-        .cup-lid {
-            position: absolute;
-            top: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 40px;
-            background: linear-gradient(145deg, 
-                #ffd700 0%, 
-                #ffed4e 30%, 
-                #d4af37 50%, 
-                #b8860b 70%, 
-                #8b6914 100%);
-            border-radius: 50%;
-            box-shadow: 
-                0 5px 15px rgba(0,0,0,0.3),
-                inset 0 2px 5px rgba(255,255,255,0.5),
-                inset 0 -2px 5px rgba(0,0,0,0.2);
-        }
-        
-        /* 金边装饰 */
+        /* 杯口 */
         .cup-rim {
             position: absolute;
-            left: 10px;
-            right: 10px;
-            height: 15px;
-            background: linear-gradient(90deg, 
-                #b8860b 0%, 
-                #ffd700 25%, 
-                #ffed4e 50%, 
-                #ffd700 75%, 
-                #b8860b 100%);
-            border-radius: 8px;
-            box-shadow: 
-                0 3px 8px rgba(0,0,0,0.3),
-                inset 0 1px 2px rgba(255,255,255,0.5);
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 30px;
+            background: linear-gradient(90deg, #b8860b, #ffd700, #ffed4e, #ffd700, #b8860b);
+            border-radius: 50%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
         
-        .cup-rim.top { top: 30%; }
-        .cup-rim.bottom { bottom: 30%; }
-        
-        /* 把手 */
-        .cup-handle-3d {
+        /* 杯底 */
+        .cup-bottom {
             position: absolute;
-            right: -30px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 50px;
-            height: 80px;
-            background: linear-gradient(90deg, 
-                #606060 0%, 
-                #808080 30%, 
-                #a0a0a0 50%, 
-                #808080 70%, 
-                #606060 100%);
-            border-radius: 0 40px 40px 0;
-            box-shadow: 
-                5px 0 15px rgba(0,0,0,0.3),
-                inset 0 5px 10px rgba(255,255,255,0.2),
-                inset 0 -5px 10px rgba(0,0,0,0.2);
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 130px;
+            height: 25px;
+            background: linear-gradient(90deg, #808080, #a0a0a0, #808080);
+            border-radius: 50%;
         }
         
-        /* 状态提示 */
-        .status-bar {
-            margin-top: 30px;
-            text-align: center;
-            min-height: 50px;
-        }
-        
-        .status-text {
-            color: rgba(255,255,255,0.8);
-            font-size: 1em;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-        
-        .status-text.highlight {
-            color: #fbbf24;
-            font-size: 1.1em;
-            animation: pulse-text 1.5s infinite;
-        }
-        
-        @keyframes pulse-text {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.7; transform: scale(1.02); }
-        }
-        
-        /* 结果展示 */
-        .result-panel {
-            background: rgba(255,255,255,0.95);
-            border-radius: 20px;
-            padding: 20px 30px;
+        /* 状态文字 */
+        .status {
             margin-top: 20px;
-            text-align: center;
+            font-size: 1em;
+            color: rgba(255,255,255,0.8);
+            min-height: 24px;
+        }
+        
+        .status.blink {
+            animation: blink 1s infinite;
+            color: #ffd700;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* 结果 */
+        .result {
+            margin-top: 15px;
             opacity: 0;
-            transform: translateY(20px) scale(0.95);
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: 0.5s;
         }
         
-        .result-panel.show {
+        .result.show {
             opacity: 1;
-            transform: translateY(0) scale(1);
         }
         
-        .result-number {
-            font-size: 3em;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            line-height: 1;
+        .result-num {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #ffd700;
         }
         
         .result-detail {
-            color: var(--text-light);
-            margin-top: 8px;
-            font-size: 0.95em;
+            color: rgba(255,255,255,0.7);
+            margin-top: 5px;
         }
-        
-        .result-luck {
-            margin-top: 10px;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.9em;
-            display: inline-block;
-        }
-        
-        .luck-great { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e; }
-        .luck-good { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; }
-        .luck-ok { background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #1e40af; }
-        .luck-bad { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #991b1b; }
         
         /* 主按钮 */
-        .action-btn {
+        .main-btn {
             position: fixed;
-            bottom: 30px;
+            bottom: 25px;
             left: 50%;
             transform: translateX(-50%);
-            padding: 18px 50px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
+            padding: 16px 50px;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: #333;
             border: none;
             border-radius: 30px;
             font-size: 1.1em;
-            font-weight: 700;
+            font-weight: bold;
             cursor: pointer;
-            box-shadow: 
-                0 10px 30px rgba(99, 102, 241, 0.4),
-                0 0 0 4px rgba(99, 102, 241, 0.1);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 25px rgba(255,215,0,0.4);
             z-index: 100;
-        }
-        
-        .action-btn:hover {
-            transform: translateX(-50%) translateY(-3px);
-            box-shadow: 
-                0 15px 40px rgba(99, 102, 241, 0.5),
-                0 0 0 6px rgba(99, 102, 241, 0.15);
-        }
-        
-        .action-btn:active {
-            transform: translateX(-50%) scale(0.97);
-        }
-        
-        .action-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        
-        /* 操作指引 */
-        .guide {
-            background: rgba(255,255,255,0.6);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            padding: 16px;
-            margin-top: 20px;
-            text-align: center;
-        }
-        
-        .guide-title {
-            font-weight: 700;
-            color: var(--text);
-            margin-bottom: 8px;
-            font-size: 0.95em;
-        }
-        
-        .guide-steps {
-            color: var(--text-light);
-            font-size: 0.85em;
-            line-height: 1.6;
         }
     </style>
 </head>
 <body>
-    <div class="bg-decoration">
-        <div class="bg-circle bg-circle-1"></div>
-        <div class="bg-circle bg-circle-2"></div>
-        <div class="bg-circle bg-circle-3"></div>
-    </div>
-    
     <div class="container">
-        <!-- 头部 -->
-        <div class="header-card">
-            <div class="header-title">🎲 3D豪华骰盅</div>
-            <div class="header-subtitle">金属质感 · 真实体验</div>
+        <div class="title">
+            <h1>🎲 摇骰子</h1>
         </div>
         
-        <!-- 设置 -->
-        <div class="settings-card">
-            <div class="setting-item">
-                <div class="setting-label">🎲 骰子数量</div>
+        <div class="settings">
+            <div class="setting-row">
+                <span class="setting-label">🎲 骰子数量</span>
                 <div class="dice-selector">
-                    <button class="dice-option" onclick="setDice(1)">1</button>
-                    <button class="dice-option active" onclick="setDice(2)">2</button>
-                    <button class="dice-option" onclick="setDice(3)">3</button>
-                    <button class="dice-option" onclick="setDice(4)">4</button>
-                    <button class="dice-option" onclick="setDice(5)">5</button>
+                    <button class="dice-btn" onclick="setDiceCount(1)">1</button>
+                    <button class="dice-btn active" onclick="setDiceCount(2)">2</button>
+                    <button class="dice-btn" onclick="setDiceCount(3)">3</button>
+                    <button class="dice-btn" onclick="setDiceCount(4)">4</button>
+                    <button class="dice-btn" onclick="setDiceCount(5)">5</button>
                 </div>
             </div>
-            
-            <div class="setting-item">
-                <div class="setting-label">🤖 自动开盅</div>
-                <div class="switch" id="autoSwitch" onclick="toggleAuto()">
-                    <div class="switch-knob"></div>
-                </div>
+            <div class="setting-row">
+                <span class="setting-label">🤖 自动开盅</span>
+                <div class="toggle" id="autoToggle" onclick="toggleAuto()"></div>
             </div>
         </div>
         
-        <!-- 游戏台 -->
-        <div class="game-stage">
-            <div class="stage-texture"></div>
-            
-            <div class="game-3d">
-                <!-- 骰子 -->
-                <div class="dice-area" id="diceArea"></div>
+        <div class="game-box">
+            <div class="cup-wrapper">
+                <!-- 骰子容器 -->
+                <div class="dice-container" id="diceContainer"></div>
                 
-                <!-- 3D骰盅 -->
-                <div class="cup-3d" id="cup3d" onclick="clickCup()">
-                    <div class="cup-body-3d">
-                        <div class="cup-main">
-                            <div class="cup-lid"></div>
-                            <div class="cup-rim top"></div>
-                            <div class="cup-rim bottom"></div>
-                            <div class="cup-handle-3d"></div>
-                        </div>
-                    </div>
+                <!-- 骰盅 -->
+                <div class="cup" id="cup" onclick="clickCup()">
+                    <div class="cup-rim"></div>
+                    <div class="cup-body"></div>
+                    <div class="cup-bottom"></div>
                 </div>
             </div>
             
-            <div class="status-bar">
-                <div class="status-text" id="statusText">点击「开始游戏」摇骰子</div>
-            </div>
+            <div class="status" id="status">点击「摇一摇」开始</div>
             
-            <div class="result-panel" id="resultPanel">
-                <div class="result-number" id="resultNum">-</div>
+            <div class="result" id="result">
+                <div class="result-num" id="resultNum">-</div>
                 <div class="result-detail" id="resultDetail"></div>
-                <div class="result-luck" id="resultLuck"></div>
-            </div>
-        </div>
-        
-        <!-- 指引 -->
-        <div class="guide">
-            <div class="guide-title">📖 游戏指南</div>
-            <div class="guide-steps">
-                1. 选择骰子数量 → 2. 点击开始 → 3. 摇晃中点击停止
-                <br>
-                4. 手动/自动开盅 → 5. 查看运气结果
             </div>
         </div>
     </div>
     
-    <button class="action-btn" id="actionBtn" onclick="mainAction()">🎲 开始游戏</button>
+    <button class="main-btn" id="mainBtn" onclick="mainAction()">🎲 摇一摇</button>
 
     <script>
         let tg = window.Telegram.WebApp;
@@ -717,202 +389,182 @@
         let autoOpen = false;
         let results = [];
         
-        function setDice(n) {
+        // 设置骰子数量
+        function setDiceCount(n) {
             if (isShaking) return;
             numDice = n;
-            document.querySelectorAll('.dice-option').forEach((btn, i) => {
+            document.querySelectorAll('.dice-btn').forEach((btn, i) => {
                 btn.classList.toggle('active', i === n - 1);
             });
-            initDice();
+            createDice();
             reset();
         }
         
+        // 切换自动开盅
         function toggleAuto() {
             autoOpen = !autoOpen;
-            document.getElementById('autoSwitch').classList.toggle('on', autoOpen);
+            document.getElementById('autoToggle').classList.toggle('on', autoOpen);
         }
         
-        function initDice() {
-            const area = document.getElementById('diceArea');
-            area.innerHTML = '';
+        // 创建骰子
+        function createDice() {
+            const container = document.getElementById('diceContainer');
+            container.innerHTML = '';
+            
             for (let i = 0; i < numDice; i++) {
-                const die = createDie(i);
-                die.style.opacity = '0';
-                area.appendChild(die);
+                const dice = document.createElement('div');
+                dice.className = 'dice';
+                dice.id = 'dice' + i;
+                dice.innerHTML = '<div class="dot"></div>';
+                dice.setAttribute('data-value', '1');
+                container.appendChild(dice);
             }
         }
         
-        function createDie(index) {
-            const die = document.createElement('div');
-            die.className = 'die';
-            die.id = 'die' + index;
-            
-            const faces = [
-                { value: 1, class: 'face-1' },
-                { value: 6, class: 'face-6' },
-                { value: 3, class: 'face-3' },
-                { value: 4, class: 'face-4' },
-                { value: 5, class: 'face-5' },
-                { value: 2, class: 'face-2' }
-            ];
-            
-            faces.forEach(face => {
-                const div = document.createElement('div');
-                div.className = `die-face ${face.class}`;
-                div.innerHTML = Array(face.value).fill('<div class="pip"></div>').join('');
-                die.appendChild(div);
-            });
-            
-            return die;
-        }
-        
+        // 主按钮动作
         function mainAction() {
             if (isShaking) {
                 stopShake();
             } else if (isOpen) {
                 reset();
-                setTimeout(startShake, 300);
+                setTimeout(startShake, 200);
             } else {
                 startShake();
             }
         }
         
+        // 开始摇晃
         function startShake() {
             isShaking = true;
             isOpen = false;
+            results = [];
             
-            document.getElementById('cup3d').classList.remove('open');
-            document.getElementById('cup3d').classList.add('shaking');
+            // 关闭骰盅
+            document.getElementById('cup').classList.remove('open');
+            document.getElementById('cup').classList.add('shaking');
             
-            document.getElementById('actionBtn').textContent = '⏹ 点击停止';
-            document.getElementById('statusText').textContent = '🎲 骰盅摇晃中...点击停止';
-            document.getElementById('statusText').classList.add('highlight');
-            document.getElementById('resultPanel').classList.remove('show');
+            // 隐藏所有骰子
+            for (let i = 0; i < numDice; i++) {
+                const dice = document.getElementById('dice' + i);
+                if (dice) {
+                    dice.classList.remove('show');
+                    dice.style.opacity = '0';
+                }
+            }
             
-            // 确保所有骰子都隐藏
-            const dice = document.querySelectorAll('.die');
-            dice.forEach(d => d.style.opacity = '0');
+            document.getElementById('mainBtn').textContent = '⏹ 停止';
+            document.getElementById('status').textContent = '🎲 摇晃中...点击停止';
+            document.getElementById('status').classList.add('blink');
+            document.getElementById('result').classList.remove('show');
             
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
             
-            setTimeout(() => { if (isShaking) stopShake(); }, 3000);
+            // 3秒后自动停止
+            setTimeout(() => {
+                if (isShaking) stopShake();
+            }, 2500);
         }
         
+        // 停止摇晃
         function stopShake() {
             if (!isShaking) return;
             isShaking = false;
             
-            document.getElementById('cup3d').classList.remove('shaking');
+            document.getElementById('cup').classList.remove('shaking');
             
-            results = [];
+            // 生成随机结果
             for (let i = 0; i < numDice; i++) {
-                const val = Math.floor(Math.random() * 6) + 1;
-                results.push(val);
-                rotateDie(i, val);
+                const value = Math.floor(Math.random() * 6) + 1;
+                results.push(value);
+                
+                const dice = document.getElementById('dice' + i);
+                if (dice) {
+                    dice.setAttribute('data-value', value);
+                    dice.innerHTML = Array(value).fill('<div class="dot"></div>').join('');
+                }
             }
             
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('heavy');
             
-            document.getElementById('actionBtn').textContent = '🎲 再玩一次';
+            document.getElementById('mainBtn').textContent = '🎲 再摇一次';
             
             if (autoOpen) {
-                setTimeout(openCup, 500);
+                setTimeout(openCup, 400);
             } else {
-                document.getElementById('statusText').textContent = '👆 点击骰盅掀开看结果';
-                document.getElementById('statusText').classList.remove('highlight');
+                document.getElementById('status').textContent = '👆 点击骰盅看结果';
+                document.getElementById('status').classList.remove('blink');
             }
         }
         
-        function rotateDie(index, value) {
-            const die = document.getElementById('die' + index);
-            const rotations = {
-                1: 'rotateX(0deg) rotateY(0deg)',
-                6: 'rotateX(180deg) rotateY(0deg)',
-                3: 'rotateX(0deg) rotateY(-90deg)',
-                4: 'rotateX(0deg) rotateY(90deg)',
-                5: 'rotateX(-90deg) rotateY(0deg)',
-                2: 'rotateX(90deg) rotateY(0deg)'
-            };
-            die.style.transform = rotations[value];
-        }
-        
+        // 点击骰盅
         function clickCup() {
             if (isShaking) {
                 stopShake();
-            } else if (results.length > 0 && !isOpen) {
+            } else if (!isOpen && results.length > 0) {
                 openCup();
             }
         }
         
+        // 开盅
         function openCup() {
             isOpen = true;
-            document.getElementById('cup3d').classList.add('open');
+            document.getElementById('cup').classList.add('open');
             
-            // 显示所有骰子 - 使用更可靠的选择器
-            const dice = document.querySelectorAll('.die');
-            dice.forEach((die, i) => {
-                if (i < numDice) {
-                    setTimeout(() => {
-                        die.style.opacity = '1';
-                        // 添加一个缩放入场效果
-                        const currentTransform = die.style.transform || '';
-                        die.style.transform = currentTransform + ' scale(1.15)';
-                        setTimeout(() => {
-                            die.style.transform = currentTransform + ' scale(1)';
-                        }, 150);
-                    }, i * 100);
-                }
-            });
-            
-            const total = results.reduce((a, b) => a + b, 0);
-            const max = numDice * 6;
-            const percent = total / max;
-            
-            document.getElementById('resultNum').textContent = total + '点';
-            document.getElementById('resultDetail').textContent = results.join(' + ') + ' = ' + total;
-            
-            const luckEl = document.getElementById('resultLuck');
-            if (percent >= 0.83) {
-                luckEl.textContent = '🔥 运气爆棚！';
-                luckEl.className = 'result-luck luck-great';
-            } else if (percent >= 0.67) {
-                luckEl.textContent = '✨ 手气不错！';
-                luckEl.className = 'result-luck luck-good';
-            } else if (percent >= 0.5) {
-                luckEl.textContent = '👍 还可以~';
-                luckEl.className = 'result-luck luck-ok';
-            } else {
-                luckEl.textContent = '💪 再接再厉！';
-                luckEl.className = 'result-luck luck-bad';
+            // 逐个显示骰子
+            for (let i = 0; i < numDice; i++) {
+                setTimeout(() => {
+                    const dice = document.getElementById('dice' + i);
+                    if (dice) {
+                        dice.style.opacity = '1';
+                        dice.classList.add('show');
+                    }
+                }, i * 150);
             }
             
-            document.getElementById('resultPanel').classList.add('show');
-            document.getElementById('statusText').textContent = '🎉 结果揭晓！再来一局？';
+            // 显示结果
+            const total = results.reduce((a, b) => a + b, 0);
+            const max = numDice * 6;
+            
+            document.getElementById('resultNum').textContent = total + ' 点';
+            
+            let detail = results.join(' + ') + ' = ' + total;
+            const ratio = total / max;
+            if (ratio >= 0.8) detail += ' 🔥 运气爆棚!';
+            else if (ratio >= 0.6) detail += ' ✨ 不错哦!';
+            else if (ratio >= 0.4) detail += ' 👍 还可以';
+            else detail += ' 💪 再接再厉';
+            
+            document.getElementById('resultDetail').textContent = detail;
+            document.getElementById('result').classList.add('show');
+            document.getElementById('status').textContent = '掀开成功！再来一局？';
             
             if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         }
         
+        // 重置
         function reset() {
             isShaking = false;
             isOpen = false;
             results = [];
-            document.getElementById('cup3d').classList.remove('shaking', 'open');
-            document.getElementById('actionBtn').textContent = '🎲 开始游戏';
-            document.getElementById('statusText').textContent = '点击「开始游戏」摇骰子';
-            document.getElementById('statusText').classList.remove('highlight');
-            document.getElementById('resultPanel').classList.remove('show');
+            
+            document.getElementById('cup').classList.remove('shaking', 'open');
+            document.getElementById('mainBtn').textContent = '🎲 摇一摇';
+            document.getElementById('status').textContent = '点击「摇一摇」开始';
+            document.getElementById('status').classList.remove('blink');
+            document.getElementById('result').classList.remove('show');
             
             // 隐藏所有骰子
-            for (let i = 0; i < 5; i++) {
-                const die = document.getElementById('die' + i);
-                if (die) die.style.opacity = '0';
+            for (let i = 0; i < numDice; i++) {
+                const dice = document.getElementById('dice' + i);
+                if (dice) {
+                    dice.classList.remove('show');
+                    dice.style.opacity = '0';
+                }
             }
-            
-            // 重新初始化骰子
-            initDice();
         }
         
-        initDice();
+        // 初始化
+        createDice();
     </script>
 </body>
 </html>
