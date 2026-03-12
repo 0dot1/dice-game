@@ -789,7 +789,9 @@
             document.getElementById('statusText').classList.add('highlight');
             document.getElementById('resultPanel').classList.remove('show');
             
-            document.querySelectorAll('.die').forEach(d => d.style.opacity = '0');
+            // 确保所有骰子都隐藏
+            const dice = document.querySelectorAll('.die');
+            dice.forEach(d => d.style.opacity = '0');
             
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
             
@@ -846,19 +848,21 @@
             isOpen = true;
             document.getElementById('cup3d').classList.add('open');
             
-            // 显示所有骰子
-            for (let i = 0; i < numDice; i++) {
-                const die = document.getElementById('die' + i);
-                if (die) {
+            // 显示所有骰子 - 使用更可靠的选择器
+            const dice = document.querySelectorAll('.die');
+            dice.forEach((die, i) => {
+                if (i < numDice) {
                     setTimeout(() => {
                         die.style.opacity = '1';
-                        die.style.transform += ' scale(1.1)';
+                        // 添加一个缩放入场效果
+                        const currentTransform = die.style.transform || '';
+                        die.style.transform = currentTransform + ' scale(1.15)';
                         setTimeout(() => {
-                            die.style.transform = die.style.transform.replace(' scale(1.1)', '');
-                        }, 200);
-                    }, i * 80);
+                            die.style.transform = currentTransform + ' scale(1)';
+                        }, 150);
+                    }, i * 100);
                 }
-            }
+            });
             
             const total = results.reduce((a, b) => a + b, 0);
             const max = numDice * 6;
