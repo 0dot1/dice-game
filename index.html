@@ -199,12 +199,12 @@
         .dice[data-value="6"] .dot:nth-child(5) { grid-area: 3/1; }
         .dice[data-value="6"] .dot:nth-child(6) { grid-area: 3/3; }
         
-        /* 直筒圆形骰盅 */
+        /* 直筒圆形骰盅 - 倒扣样式 */
         .cup {
             position: absolute;
             top: 10px;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translateX(-50%) rotate(180deg);
             width: 140px;
             height: 180px;
             z-index: 10;
@@ -217,13 +217,13 @@
         }
         
         @keyframes shake {
-            0%, 100% { transform: translateX(-50%) rotate(0deg); }
-            25% { transform: translateX(calc(-50% - 5px)) rotate(-5deg); }
-            75% { transform: translateX(calc(-50% + 5px)) rotate(5deg); }
+            0%, 100% { transform: translateX(-50%) rotate(180deg) rotate(0deg); }
+            25% { transform: translateX(calc(-50% - 5px)) rotate(180deg) rotate(-5deg); }
+            75% { transform: translateX(calc(-50% + 5px)) rotate(180deg) rotate(5deg); }
         }
         
         .cup.open {
-            transform: translateX(-50%) translateY(-220px) rotate(-20deg);
+            transform: translateX(-50%) translateY(-220px) rotate(160deg);
             opacity: 0.9;
         }
         
