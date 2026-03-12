@@ -846,17 +846,19 @@
             isOpen = true;
             document.getElementById('cup3d').classList.add('open');
             
-            document.querySelectorAll('.die').forEach((d, i) => {
-                if (i < numDice) {
+            // 显示所有骰子
+            for (let i = 0; i < numDice; i++) {
+                const die = document.getElementById('die' + i);
+                if (die) {
                     setTimeout(() => {
-                        d.style.opacity = '1';
-                        d.style.transform += ' scale(1.1)';
+                        die.style.opacity = '1';
+                        die.style.transform += ' scale(1.1)';
                         setTimeout(() => {
-                            d.style.transform = d.style.transform.replace(' scale(1.1)', '');
+                            die.style.transform = die.style.transform.replace(' scale(1.1)', '');
                         }, 200);
-                    }, i * 100);
+                    }, i * 80);
                 }
-            });
+            }
             
             const total = results.reduce((a, b) => a + b, 0);
             const max = numDice * 6;
@@ -895,7 +897,15 @@
             document.getElementById('statusText').textContent = '点击「开始游戏」摇骰子';
             document.getElementById('statusText').classList.remove('highlight');
             document.getElementById('resultPanel').classList.remove('show');
-            document.querySelectorAll('.die').forEach(d => d.style.opacity = '0');
+            
+            // 隐藏所有骰子
+            for (let i = 0; i < 5; i++) {
+                const die = document.getElementById('die' + i);
+                if (die) die.style.opacity = '0';
+            }
+            
+            // 重新初始化骰子
+            initDice();
         }
         
         initDice();
