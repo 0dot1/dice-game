@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>🎲 摇骰子 - 骰盅版</title>
+    <title>🎲 骰盅游戏</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -15,99 +15,85 @@
         
         body {
             min-height: 100vh;
-            background: linear-gradient(180deg, #2d1b4e 0%, #1a0f2e 50%, #0d0514 100%);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(180deg, #1a0f2e 0%, #0d0514 100%);
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
             color: white;
-            overflow-x: hidden;
+            padding-bottom: 100px;
         }
         
         .container {
-            max-width: 450px;
+            max-width: 400px;
             margin: 0 auto;
             padding: 20px;
-            padding-bottom: 160px;
         }
         
-        /* 头部 */
         .header {
             text-align: center;
-            padding: 15px 0;
+            padding: 10px 0;
         }
         
         .header h1 {
-            font-size: 2em;
-            background: linear-gradient(45deg, #ffd700, #ff6b35);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(255,215,0,0.3);
+            font-size: 1.8em;
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255,215,0,0.5);
         }
         
-        .subtitle {
-            color: rgba(255,255,255,0.5);
-            font-size: 0.85em;
-            margin-top: 5px;
-        }
-        
-        /* 设置栏 */
         .settings {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.1);
             border-radius: 16px;
-            padding: 12px 16px;
+            padding: 15px;
             margin: 15px 0;
         }
         
-        .setting-item {
+        .setting-row {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 8px;
+            margin: 10px 0;
         }
         
         .setting-label {
-            font-size: 0.85em;
-            color: rgba(255,255,255,0.7);
+            font-size: 0.9em;
+            color: rgba(255,255,255,0.8);
         }
         
-        .dice-count-selector {
+        .dice-btns {
             display: flex;
-            gap: 5px;
+            gap: 8px;
         }
         
-        .count-btn {
-            width: 36px;
-            height: 36px;
+        .dice-btn {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            border: 2px solid rgba(255,255,255,0.3);
+            border: 2px solid rgba(255,215,0,0.5);
             background: transparent;
             color: white;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s;
         }
         
-        .count-btn.active {
-            background: linear-gradient(135deg, #ffd700, #ff6b35);
-            border-color: transparent;
-            box-shadow: 0 0 15px rgba(255,215,0,0.4);
+        .dice-btn.active {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            border-color: #ffd700;
+            color: #1a0f2e;
         }
         
-        .toggle-switch {
-            position: relative;
+        .toggle {
             width: 50px;
             height: 28px;
             background: rgba(255,255,255,0.2);
             border-radius: 14px;
+            position: relative;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: 0.3s;
         }
         
-        .toggle-switch.active {
-            background: linear-gradient(135deg, #00d26a, #00a854);
+        .toggle.on {
+            background: #00d26a;
         }
         
-        .toggle-switch::after {
+        .toggle::after {
             content: '';
             position: absolute;
             width: 24px;
@@ -116,356 +102,248 @@
             border-radius: 50%;
             top: 2px;
             left: 2px;
-            transition: transform 0.3s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: 0.3s;
         }
         
-        .toggle-switch.active::after {
-            transform: translateX(22px);
+        .toggle.on::after {
+            left: 24px;
         }
         
-        /* 游戏区域 */
-        .game-area {
-            background: linear-gradient(145deg, rgba(139,69,19,0.3), rgba(101,67,33,0.2));
-            border-radius: 24px;
-            padding: 30px 20px;
+        .table {
+            background: linear-gradient(145deg, #8b4513, #654321);
+            border-radius: 20px;
+            padding: 40px 20px;
             margin: 20px 0;
-            border: 1px solid rgba(139,69,19,0.3);
             position: relative;
             min-height: 280px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5), inset 0 0 100px rgba(0,0,0,0.3);
         }
         
-        .table-texture {
-            position: absolute;
-            inset: 0;
-            background: 
-                repeating-linear-gradient(
-                    45deg,
-                    transparent,
-                    transparent 10px,
-                    rgba(0,0,0,0.03) 10px,
-                    rgba(0,0,0,0.03) 20px
-                );
-            border-radius: 24px;
-            pointer-events: none;
-        }
-        
-        /* 骰盅容器 */
-        .cup-container {
+        .game-area {
             position: relative;
             width: 200px;
-            height: 200px;
+            height: 180px;
             display: flex;
             justify-content: center;
             align-items: center;
         }
         
-        /* 骰盅 */
-        .dice-cup {
-            position: absolute;
-            width: 160px;
-            height: 160px;
-            z-index: 10;
-            transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            cursor: pointer;
+        .dice-box {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            max-width: 180px;
+            position: relative;
+            z-index: 1;
         }
         
-        .dice-cup.shaking {
-            animation: cupShake 0.15s infinite;
+        .dice {
+            width: 45px;
+            height: 45px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3), inset 0 -2px 5px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            padding: 4px;
+            transition: all 0.3s;
+        }
+        
+        .dice-dot {
+            width: 8px;
+            height: 8px;
+            background: #333;
+            border-radius: 50%;
+            margin: auto;
+        }
+        
+        .dice[data-value="1"] .dice-dot:nth-child(1) { grid-area: 2/2; width: 14px; height: 14px; background: #e74c3c; }
+        .dice[data-value="2"] .dice-dot:nth-child(1) { grid-area: 1/1; }
+        .dice[data-value="2"] .dice-dot:nth-child(2) { grid-area: 3/3; }
+        .dice[data-value="3"] .dice-dot:nth-child(1) { grid-area: 1/1; }
+        .dice[data-value="3"] .dice-dot:nth-child(2) { grid-area: 2/2; }
+        .dice[data-value="3"] .dice-dot:nth-child(3) { grid-area: 3/3; }
+        .dice[data-value="4"] .dice-dot:nth-child(1) { grid-area: 1/1; }
+        .dice[data-value="4"] .dice-dot:nth-child(2) { grid-area: 1/3; }
+        .dice[data-value="4"] .dice-dot:nth-child(3) { grid-area: 3/1; }
+        .dice[data-value="4"] .dice-dot:nth-child(4) { grid-area: 3/3; }
+        .dice[data-value="5"] .dice-dot:nth-child(1) { grid-area: 1/1; }
+        .dice[data-value="5"] .dice-dot:nth-child(2) { grid-area: 1/3; }
+        .dice[data-value="5"] .dice-dot:nth-child(3) { grid-area: 2/2; }
+        .dice[data-value="5"] .dice-dot:nth-child(4) { grid-area: 3/1; }
+        .dice[data-value="5"] .dice-dot:nth-child(5) { grid-area: 3/3; }
+        .dice[data-value="6"] .dice-dot:nth-child(1) { grid-area: 1/1; }
+        .dice[data-value="6"] .dice-dot:nth-child(2) { grid-area: 1/3; }
+        .dice[data-value="6"] .dice-dot:nth-child(3) { grid-area: 2/1; }
+        .dice[data-value="6"] .dice-dot:nth-child(4) { grid-area: 2/3; }
+        .dice[data-value="6"] .dice-dot:nth-child(5) { grid-area: 3/1; }
+        .dice[data-value="6"] .dice-dot:nth-child(6) { grid-area: 3/3; }
+        
+        .cup {
+            position: absolute;
+            width: 180px;
+            height: 140px;
+            z-index: 10;
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        .cup.shaking {
+            animation: cupShake 0.12s infinite;
         }
         
         @keyframes cupShake {
             0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            25% { transform: translate(-5px, -8px) rotate(-5deg); }
-            50% { transform: translate(5px, -5px) rotate(5deg); }
-            75% { transform: translate(-3px, -10px) rotate(-3deg); }
+            25% { transform: translate(-3px, -5px) rotate(-3deg); }
+            50% { transform: translate(3px, -3px) rotate(3deg); }
+            75% { transform: translate(-2px, -6px) rotate(-2deg); }
         }
         
-        .dice-cup.open {
-            transform: translateY(-220px) rotate(-15deg);
-            opacity: 0.9;
+        .cup.open {
+            transform: translateY(-200px) translateX(50px) rotate(30deg);
+            opacity: 0.95;
         }
         
-        /* 骰盅身体 */
         .cup-body {
             width: 100%;
             height: 100%;
             background: linear-gradient(135deg, #c0c0c0 0%, #808080 50%, #404040 100%);
-            border-radius: 50% 50% 45% 45%;
+            border-radius: 50% 50% 40% 40%;
             position: relative;
-            box-shadow: 
-                0 20px 40px rgba(0,0,0,0.4),
-                inset 0 -10px 20px rgba(0,0,0,0.3),
-                inset 0 10px 20px rgba(255,255,255,0.2);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5), inset 0 -8px 15px rgba(0,0,0,0.3), inset 0 8px 15px rgba(255,255,255,0.2);
         }
         
-        /* 骰盅顶部 */
         .cup-top {
             position: absolute;
-            top: -20px;
+            top: -15px;
             left: 50%;
             transform: translateX(-50%);
-            width: 100px;
-            height: 40px;
-            background: linear-gradient(135deg, #d4af37, #b8860b);
+            width: 90px;
+            height: 35px;
+            background: linear-gradient(135deg, #ffd700, #b8860b);
             border-radius: 50%;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
         }
         
-        /* 骰盅把手 */
         .cup-handle {
             position: absolute;
-            right: -30px;
+            right: -25px;
             top: 50%;
             transform: translateY(-50%);
-            width: 50px;
-            height: 80px;
-            border: 12px solid #808080;
+            width: 45px;
+            height: 70px;
+            border: 10px solid #696969;
             border-left: none;
-            border-radius: 0 40px 40px 0;
-            box-shadow: 5px 0 10px rgba(0,0,0,0.2);
+            border-radius: 0 35px 35px 0;
         }
         
-        /* 装饰环 */
         .cup-ring {
             position: absolute;
-            left: 0;
-            right: 0;
-            height: 15px;
-            background: linear-gradient(90deg, #d4af37, #ffd700, #d4af37);
+            left: 5%;
+            right: 5%;
+            height: 12px;
+            background: linear-gradient(90deg, #b8860b, #ffd700, #b8860b);
+            border-radius: 6px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
         
-        .cup-ring.top { top: 30%; }
-        .cup-ring.bottom { bottom: 30%; }
+        .cup-ring.top { top: 25%; }
+        .cup-ring.bottom { bottom: 25%; }
         
-        /* 骰子 */
-        .dice-container {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            z-index: 5;
-        }
-        
-        .dice {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(145deg, #fff 0%, #f0f0f0 100%);
-            border-radius: 12px;
-            box-shadow: 
-                0 5px 15px rgba(0,0,0,0.3),
-                inset 0 -3px 8px rgba(0,0,0,0.1);
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(3, 1fr);
-            padding: 6px;
-            gap: 2px;
-            transform-style: preserve-3d;
-            transition: transform 0.3s;
-        }
-        
-        .dice.hidden {
-            opacity: 0;
-            transform: scale(0.8);
-        }
-        
-        .dot {
-            width: 10px;
-            height: 10px;
-            background: #333;
-            border-radius: 50%;
-            margin: auto;
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
-        }
-        
-        .dot.red {
-            background: linear-gradient(145deg, #ff4444, #cc0000);
-            box-shadow: 0 0 8px rgba(255,68,68,0.5);
-        }
-        
-        /* 点数布局 */
-        .dice[data-value="1"] .dot:nth-child(1) { grid-area: 2 / 2; width: 18px; height: 18px; }
-        .dice[data-value="1"] .dot:nth-child(1) { background: linear-gradient(145deg, #ff4444, #cc0000); }
-        
-        .dice[data-value="2"] .dot:nth-child(1) { grid-area: 1 / 1; }
-        .dice[data-value="2"] .dot:nth-child(2) { grid-area: 3 / 3; }
-        
-        .dice[data-value="3"] .dot:nth-child(1) { grid-area: 1 / 1; }
-        .dice[data-value="3"] .dot:nth-child(2) { grid-area: 2 / 2; }
-        .dice[data-value="3"] .dot:nth-child(3) { grid-area: 3 / 3; }
-        
-        .dice[data-value="4"] .dot:nth-child(1) { grid-area: 1 / 1; }
-        .dice[data-value="4"] .dot:nth-child(2) { grid-area: 1 / 3; }
-        .dice[data-value="4"] .dot:nth-child(3) { grid-area: 3 / 1; }
-        .dice[data-value="4"] .dot:nth-child(4) { grid-area: 3 / 3; }
-        
-        .dice[data-value="5"] .dot:nth-child(1) { grid-area: 1 / 1; }
-        .dice[data-value="5"] .dot:nth-child(2) { grid-area: 1 / 3; }
-        .dice[data-value="5"] .dot:nth-child(3) { grid-area: 2 / 2; }
-        .dice[data-value="5"] .dot:nth-child(4) { grid-area: 3 / 1; }
-        .dice[data-value="5"] .dot:nth-child(5) { grid-area: 3 / 3; }
-        
-        .dice[data-value="6"] .dot:nth-child(1) { grid-area: 1 / 1; }
-        .dice[data-value="6"] .dot:nth-child(2) { grid-area: 1 / 3; }
-        .dice[data-value="6"] .dot:nth-child(3) { grid-area: 2 / 1; }
-        .dice[data-value="6"] .dot:nth-child(4) { grid-area: 2 / 3; }
-        .dice[data-value="6"] .dot:nth-child(5) { grid-area: 3 / 1; }
-        .dice[data-value="6"] .dot:nth-child(6) { grid-area: 3 / 3; }
-        
-        /* 提示文字 */
-        .hint-text {
+        .hint {
             text-align: center;
-            color: rgba(255,255,255,0.6);
-            font-size: 0.9em;
+            color: rgba(255,255,255,0.7);
             margin-top: 20px;
+            font-size: 0.95em;
             min-height: 24px;
         }
         
-        .hint-text.pulse {
-            animation: pulse 1.5s infinite;
+        .hint.blink {
+            animation: blink 1s infinite;
             color: #ffd700;
         }
         
-        @keyframes pulse {
-            0%, 100% { opacity: 0.6; }
-            50% { opacity: 1; }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
         
-        /* 结果展示 */
-        .result-box {
-            background: rgba(0,0,0,0.3);
-            border-radius: 16px;
-            padding: 15px 20px;
-            margin-top: 15px;
+        .result {
             text-align: center;
+            margin-top: 15px;
             opacity: 0;
-            transform: translateY(10px);
-            transition: all 0.5s;
+            transition: 0.5s;
         }
         
-        .result-box.show {
+        .result.show {
             opacity: 1;
-            transform: translateY(0);
         }
         
-        .result-total {
+        .result-num {
             font-size: 2.5em;
             font-weight: bold;
-            background: linear-gradient(45deg, #ffd700, #ff6b35);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255,215,0,0.5);
         }
         
-        .result-desc {
-            color: rgba(255,255,255,0.7);
+        .result-text {
+            color: rgba(255,255,255,0.8);
             margin-top: 5px;
         }
         
-        /* 主按钮 */
         .main-btn {
             position: fixed;
-            bottom: 30px;
+            bottom: 25px;
             left: 50%;
             transform: translateX(-50%);
-            padding: 18px 50px;
-            background: linear-gradient(135deg, #ffd700 0%, #ff6b35 100%);
+            padding: 18px 60px;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
             color: #1a0f2e;
             border: none;
             border-radius: 30px;
-            font-size: 1.1em;
+            font-size: 1.2em;
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 10px 30px rgba(255,215,0,0.3);
-            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(255,215,0,0.4);
             z-index: 100;
-        }
-        
-        .main-btn:hover {
-            transform: translateX(-50%) translateY(-3px);
-            box-shadow: 0 15px 40px rgba(255,215,0,0.4);
-        }
-        
-        .main-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        
-        /* 规则说明 */
-        .rules {
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-            padding: 15px;
-            margin-top: 15px;
-        }
-        
-        .rules-title {
-            font-weight: bold;
-            margin-bottom: 8px;
-            color: #ffd700;
-        }
-        
-        .rules-text {
-            font-size: 0.85em;
-            color: rgba(255,255,255,0.6);
-            line-height: 1.6;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎲 摇骰子</h1>
-            <div class="subtitle">盖上骰盅，摇一摇，掀开看运气！</div>
-        </div>
-        
-        <!-- 设置 -->
-        <div class="settings">
-            <div class="setting-item">
-                <span class="setting-label">🎲 骰子数量:</span>
-                <div class="dice-count-selector">
-                    <button class="count-btn" onclick="setDiceCount(1)">1</button>
-                    <button class="count-btn active" onclick="setDiceCount(2)">2</button>
-                    <button class="count-btn" onclick="setDiceCount(3)">3</button>
-                    <button class="count-btn" onclick="setDiceCount(4)">4</button>
-                    <button class="count-btn" onclick="setDiceCount(5)">5</button>
-                </div>
-            </div>
+            <h1>🎲 骰盅游戏</h1>
         </div>
         
         <div class="settings">
-            <div class="setting-item">
-                <span class="setting-label">🤖 自动开盅:</span>
-                <div class="toggle-switch" id="autoOpenToggle" onclick="toggleAutoOpen()"></div>
+            <div class="setting-row">
+                <span class="setting-label">🎲 骰子数量</span>
+                <div class="dice-btns">
+                    <button class="dice-btn" onclick="setDice(1)">1</button>
+                    <button class="dice-btn active" onclick="setDice(2)">2</button>
+                    <button class="dice-btn" onclick="setDice(3)">3</button>
+                    <button class="dice-btn" onclick="setDice(4)">4</button>
+                    <button class="dice-btn" onclick="setDice(5)">5</button>
+                </div>
             </div>
-            <div class="setting-item">
-                <span class="setting-label">🔔 震动反馈:</span>
-                <div class="toggle-switch active" id="hapticToggle" onclick="toggleHaptic()"></div>
+            <div class="setting-row">
+                <span class="setting-label">🤖 自动开盅</span>
+                <div class="toggle" id="autoToggle" onclick="toggleAuto()"></div>
             </div>
         </div>
         
-        <!-- 游戏区域 -->
-        <div class="game-area">
-            <div class="table-texture"></div>
-            
-            <div class="cup-container" id="cupContainer">
-                <!-- 骰子 -->
-                <div class="dice-container" id="diceContainer">
-                    <div class="dice hidden" data-value="1">
-                        <div class="dot"></div>
-                    </div>
-                    <div class="dice hidden" data-value="1">
-                        <div class="dot"></div>
-                    </div>
-                </div>
+        <div class="table">
+            <div class="game-area">
+                <div class="dice-box" id="diceBox"></div>
                 
-                <!-- 骰盅 -->
-                <div class="dice-cup" id="diceCup" onclick="toggleCup()">
+                <div class="cup" id="cup" onclick="clickCup()">
                     <div class="cup-body">
                         <div class="cup-top"></div>
                         <div class="cup-handle"></div>
@@ -475,245 +353,162 @@
                 </div>
             </div>
             
-            <div class="hint-text" id="hintText">点击「摇一摇」开始游戏</div>
+            <div class="hint" id="hint">点击「摇一摇」开始</div>
             
-            <div class="result-box" id="resultBox">
-                <div class="result-total" id="resultTotal">-</div>
-                <div class="result-desc" id="resultDesc"></div>
-            </div>
-        </div>
-        
-        <!-- 规则 -->
-        <div class="rules">
-            <div class="rules-title">📜 游戏规则</div>
-            <div class="rules-text">
-                1. 选择骰子数量（1-5个）<br>
-                2. 点击「摇一摇」骰盅开始摇晃<br>
-                3. 点击骰盅掀开看结果<br>
-                4. 或开启「自动开盅」自动揭晓
+            <div class="result" id="result">
+                <div class="result-num" id="resultNum">-</div>
+                <div class="result-text" id="resultText"></div>
             </div>
         </div>
     </div>
     
-    <button class="main-btn" id="mainBtn" onclick="handleMainAction()">🎲 摇一摇</button>
+    <button class="main-btn" id="mainBtn" onclick="mainAction()">🎲 摇一摇</button>
 
     <script>
         let tg = window.Telegram.WebApp;
         tg.ready();
         tg.expand();
         
-        // 游戏状态
         let numDice = 2;
         let isShaking = false;
         let isOpen = false;
         let autoOpen = false;
-        let hapticEnabled = true;
         let results = [];
         
-        // 设置骰子数量
-        function setDiceCount(n) {
+        function setDice(n) {
             if (isShaking) return;
             numDice = n;
-            document.querySelectorAll('.count-btn').forEach((btn, i) => {
+            document.querySelectorAll('.dice-btn').forEach((btn, i) => {
                 btn.classList.toggle('active', i === n - 1);
             });
-            updateDiceDisplay();
-            resetGame();
+            initDice();
+            reset();
         }
         
-        // 切换自动开盅
-        function toggleAutoOpen() {
+        function toggleAuto() {
             autoOpen = !autoOpen;
-            document.getElementById('autoOpenToggle').classList.toggle('active', autoOpen);
-            if (hapticEnabled && tg.HapticFeedback) {
-                tg.HapticFeedback.selectionChanged();
-            }
+            document.getElementById('autoToggle').classList.toggle('on', autoOpen);
         }
         
-        // 切换震动
-        function toggleHaptic() {
-            hapticEnabled = !hapticEnabled;
-            document.getElementById('hapticToggle').classList.toggle('active', hapticEnabled);
-        }
-        
-        // 更新骰子显示
-        function updateDiceDisplay() {
-            const container = document.getElementById('diceContainer');
-            container.innerHTML = '';
+        function initDice() {
+            const box = document.getElementById('diceBox');
+            box.innerHTML = '';
             for (let i = 0; i < 5; i++) {
                 const dice = document.createElement('div');
-                dice.className = 'dice' + (i >= numDice ? ' hidden' : '');
+                dice.className = 'dice';
+                dice.style.display = i < numDice ? 'grid' : 'none';
+                dice.style.opacity = '0';
                 dice.id = 'dice' + i;
-                dice.innerHTML = '<div class="dot"></div>';
+                dice.innerHTML = '<div class="dice-dot"></div>';
                 dice.setAttribute('data-value', '1');
-                container.appendChild(dice);
+                box.appendChild(dice);
             }
         }
         
-        // 主按钮动作
-        function handleMainAction() {
-            if (isShaking) return;
-            
-            if (isOpen) {
-                // 已经开了，重置再摇
-                resetGame();
-                setTimeout(startShake, 300);
-            } else if (document.getElementById('diceCup').classList.contains('shaking')) {
-                // 正在摇，停止并开奖
+        function mainAction() {
+            if (isShaking) {
                 stopShake();
+            } else if (isOpen) {
+                reset();
+                setTimeout(startShake, 200);
             } else {
-                // 开始摇
                 startShake();
             }
         }
         
-        // 开始摇晃
         function startShake() {
             isShaking = true;
             isOpen = false;
             
-            const cup = document.getElementById('diceCup');
-            cup.classList.remove('open');
-            cup.classList.add('shaking');
+            document.getElementById('cup').classList.remove('open');
+            document.getElementById('cup').classList.add('shaking');
             
             document.getElementById('mainBtn').textContent = '⏹ 停止';
-            document.getElementById('hintText').textContent = '骰盅摇晃中... 点击停止或等自动停止';
-            document.getElementById('hintText').classList.add('pulse');
-            document.getElementById('resultBox').classList.remove('show');
+            document.getElementById('hint').textContent = '骰盅摇晃中...点击停止';
+            document.getElementById('hint').classList.add('blink');
+            document.getElementById('result').classList.remove('show');
             
-            // 隐藏骰子
-            document.querySelectorAll('.dice').forEach(dice => {
-                if (!dice.classList.contains('hidden')) {
-                    dice.style.opacity = '0';
-                }
-            });
+            document.querySelectorAll('.dice').forEach(d => d.style.opacity = '0');
             
-            // 震动
-            if (hapticEnabled && tg.HapticFeedback) {
-                tg.HapticFeedback.impactOccurred('medium');
-            }
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
             
-            // 3秒后自动停止（如果没手动停）
-            setTimeout(() => {
-                if (isShaking) stopShake();
-            }, 3000);
+            setTimeout(() => { if (isShaking) stopShake(); }, 2500);
         }
         
-        // 停止摇晃
         function stopShake() {
             if (!isShaking) return;
-            
             isShaking = false;
-            const cup = document.getElementById('diceCup');
-            cup.classList.remove('shaking');
             
-            // 生成结果
+            document.getElementById('cup').classList.remove('shaking');
+            
             results = [];
             for (let i = 0; i < numDice; i++) {
-                results.push(Math.floor(Math.random() * 6) + 1);
+                const val = Math.floor(Math.random() * 6) + 1;
+                results.push(val);
+                const dice = document.getElementById('dice' + i);
+                dice.setAttribute('data-value', val);
+                dice.innerHTML = Array(val).fill('<div class="dice-dot"></div>').join('');
+                dice.style.opacity = '0';
             }
             
-            // 更新骰子显示
-            document.querySelectorAll('.dice').forEach((dice, i) => {
-                if (i < numDice) {
-                    dice.setAttribute('data-value', results[i]);
-                    dice.innerHTML = createDots(results[i]);
-                    dice.style.opacity = '1';
-                }
-            });
-            
-            // 震动
-            if (hapticEnabled && tg.HapticFeedback) {
-                tg.HapticFeedback.impactOccurred('heavy');
-            }
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('heavy');
             
             document.getElementById('mainBtn').textContent = '🎲 再摇一次';
             
             if (autoOpen) {
-                setTimeout(openCup, 500);
+                setTimeout(openCup, 400);
             } else {
-                document.getElementById('hintText').textContent = '👆 点击骰盅掀开看结果';
-                document.getElementById('hintText').classList.remove('pulse');
+                document.getElementById('hint').textContent = '👆 点击骰盅掀开看结果';
+                document.getElementById('hint').classList.remove('blink');
             }
         }
         
-        // 创建点数
-        function createDots(n) {
-            let dots = '';
-            for (let i = 0; i < n; i++) {
-                dots += '<div class="dot"></div>';
-            }
-            return dots;
-        }
-        
-        // 开关骰盅
-        function toggleCup() {
+        function clickCup() {
             if (isShaking) {
                 stopShake();
-                return;
-            }
-            
-            if (isOpen) {
-                closeCup();
-            } else {
+            } else if (results.length > 0 && !isOpen) {
                 openCup();
             }
         }
         
-        // 开盅
         function openCup() {
-            if (results.length === 0) return;
-            
             isOpen = true;
-            document.getElementById('diceCup').classList.add('open');
+            document.getElementById('cup').classList.add('open');
+            
+            document.querySelectorAll('.dice').forEach((d, i) => {
+                if (i < numDice) d.style.opacity = '1';
+            });
             
             const total = results.reduce((a, b) => a + b, 0);
-            document.getElementById('resultTotal').textContent = total + ' 点';
+            document.getElementById('resultNum').textContent = total + '点';
             
-            let desc = results.join(' + ') + ' = ' + total;
-            if (total >= numDice * 6 * 0.8) desc += ' 🔥 运气爆棚！';
-            else if (total >= numDice * 6 * 0.6) desc += ' ✨ 不错哦！';
-            else if (total >= numDice * 6 * 0.4) desc += ' 👍 还可以';
-            else desc += ' 💪 再接再厉！';
+            let text = results.join('+') + '=' + total;
+            const max = numDice * 6;
+            if (total >= max * 0.8) text += ' 🔥 运气爆棚!';
+            else if (total >= max * 0.6) text += ' ✨ 手气不错!';
+            else if (total >= max * 0.4) text += ' 👍 还可以';
+            else text += ' 💪 再接再厉';
             
-            document.getElementById('resultDesc').textContent = desc;
-            document.getElementById('resultBox').classList.add('show');
-            document.getElementById('hintText').textContent = '掀开成功！点击「再摇一次」继续';
+            document.getElementById('resultText').textContent = text;
+            document.getElementById('result').classList.add('show');
+            document.getElementById('hint').textContent = '掀开成功！再摇一次？';
             
-            if (hapticEnabled && tg.HapticFeedback) {
-                tg.HapticFeedback.notificationOccurred('success');
-            }
+            if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         }
         
-        // 关盅
-        function closeCup() {
-            isOpen = false;
-            document.getElementById('diceCup').classList.remove('open');
-            document.getElementById('resultBox').classList.remove('show');
-            document.getElementById('hintText').textContent = '点击「再摇一次」继续游戏';
-        }
-        
-        // 重置游戏
-        function resetGame() {
+        function reset() {
             isShaking = false;
             isOpen = false;
             results = [];
-            
-            const cup = document.getElementById('diceCup');
-            cup.classList.remove('shaking', 'open');
-            
+            document.getElementById('cup').classList.remove('shaking', 'open');
             document.getElementById('mainBtn').textContent = '🎲 摇一摇';
-            document.getElementById('hintText').textContent = '点击「摇一摇」开始游戏';
-            document.getElementById('hintText').classList.remove('pulse');
-            document.getElementById('resultBox').classList.remove('show');
-            
-            document.querySelectorAll('.dice').forEach(dice => {
-                dice.style.opacity = '0';
-            });
+            document.getElementById('hint').textContent = '点击「摇一摇」开始';
+            document.getElementById('hint').classList.remove('blink');
+            document.getElementById('result').classList.remove('show');
+            document.querySelectorAll('.dice').forEach(d => d.style.opacity = '0');
         }
         
-        // 初始化
-        updateDiceDisplay();
+        initDice();
     </script>
 </body>
 </html>
